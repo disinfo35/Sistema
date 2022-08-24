@@ -1,4 +1,5 @@
 ﻿using Sistema.Context;
+using Sistema.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,17 +32,23 @@ namespace Sistema.Controllers
 
         // POST: Produto/Create
         [HttpPost]
-        public ActionResult Create(FormCollection collection)
+        public ActionResult Create(Produto produto)
         {
             try
             {
                 // TODO: Add insert logic here
+                if (ModelState.IsValid)
+                {
+                    db.Produto.Add(produto);
+                    db.SaveChanges();
+                    return RedirectToAction("Index");
+                }
 
-                return RedirectToAction("Index");
+                return View(produto);
             }
             catch
             {
-                return View();
+                return View(produto);
             }
         }
 

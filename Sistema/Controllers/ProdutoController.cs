@@ -2,6 +2,7 @@
 using Sistema.Models;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Web;
@@ -66,20 +67,37 @@ namespace Sistema.Controllers
         }
 
         // GET: Produto/Edit/5
-        public ActionResult Edit(int id)
+        public ActionResult Edit(int? id)
         {
-            return View();
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            var produto = db.Produto.Find(id);
+
+            if (produto == null)
+            {
+                return HttpNotFound();
+            }
+
+            return View(produto);
         }
 
         // POST: Produto/Edit/5
         [HttpPost]
-        public ActionResult Edit(int id, FormCollection collection)
+        public ActionResult Edit(Produto produto)
         {
             try
             {
                 // TODO: Add update logic here
-
-                return RedirectToAction("Index");
+                if(ModelState.IsValid)
+                {
+                    db.Entry(produto).State = EntityState.Modified;
+                    db.SaveChanges();
+                    return RedirectToAction("Index");
+                }
+                return View(produto);
             }
             catch
             {
@@ -88,24 +106,43 @@ namespace Sistema.Controllers
         }
 
         // GET: Produto/Delete/5
-        public ActionResult Delete(int id)
+        public ActionResult Delete(int? id)
         {
-            return View();
+            if(id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            var produto = db.Produto.Find(id);
+
+            if(produto == null)
+            {
+                return HttpNotFound();
+            }
+
+            return View(produto);
         }
 
         // POST: Produto/Delete/5
         [HttpPost]
-        public ActionResult Delete(int id, FormCollection collection)
+        public ActionResult Delete(int id, Produto produto)
         {
             try
             {
                 // TODO: Add delete logic here
+                if (ModelState.IsValid)
+                {
+                    produto = db.Produto.Find(id);
+                    db.Produto.Remove(produto);
+                    db.SaveChanges();
+                    return RedirectToAction("Index");
+                }
 
-                return RedirectToAction("Index");
+                return View(produto);
             }
             catch
             {
-                return View();
+                return View(produto);
             }
         }
     }
